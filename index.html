@@ -12,7 +12,7 @@
 </head>
 <body class="design-grid-bg min-h-screen flex items-center justify-center p-4">
 
-    <div class="w-full max-w-lg bg-[#272343] p-8 md:p-12 rounded-xl shadow-2xl border border-[#433c67] text-center">
+    <div id="menu-screen" class="w-full max-w-lg bg-[#272343] p-8 md:p-12 rounded-xl shadow-2xl border border-[#433c67] text-center">
 
         <h1 id="game-title" class="mb-8 uppercase tracking-widest leading-none">
             Battle of Designers
@@ -74,10 +74,81 @@
         </p>
     </div>
 
+    <div id="game-screen" class="hidden w-full max-w-7xl h-full flex flex-col bg-[#272343]/90 rounded-xl shadow-2xl p-4 md:p-6 transition-opacity duration-500">
+        
+        <div id="status-bar" class="flex flex-col md:flex-row justify-between items-center mb-6 p-3 bg-[#1a1a2e] rounded-lg border border-[#433c67]">
+            <div class="text-xl font-bold text-[#bae8e8] mb-2 md:mb-0">
+                Turno: <span id="turn-count">1</span> | Jugador: <span id="current-player-name">Alpha</span>
+            </div>
+            
+            <div id="brief-scorecard" class="flex space-x-4 text-center text-sm md:text-base">
+                <div class="score-item">
+                    <span class="text-[#ff6584] font-bold">Impacto Visual</span>
+                    <div class="current-score" id="score-impacto">0/10</div>
+                </div>
+                <div class="score-item">
+                    <span class="text-[#8dff8d] font-bold">Usabilidad/UX</span>
+                    <div class="current-score" id="score-usabilidad">0/8</div>
+                </div>
+                <div class="score-item">
+                    <span class="text-[#8d8dff] font-bold">Cohesión Marca</span>
+                    <div class="current-score" id="score-cohesion">0/5</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-grow flex flex-col md:flex-row gap-6 mb-6">
+            
+            <div class="w-full md:w-1/4 p-4 bg-[#3b3558] rounded-lg shadow-inner">
+                <h3 class="text-xl font-bold mb-4 text-[#bae8e8] border-b border-[#5a547b] pb-2">Recursos</h3>
+                
+                <div id="resources-list" class="space-y-3">
+                    <div class="resource-item flex justify-between items-center text-lg">
+                        <span class="font-semibold text-white">⏱️ Tiempo (T):</span>
+                        <span id="res-tiempo" class="font-bold text-[#ff6584]">5/5</span>
+                    </div>
+                    <div class="resource-item flex justify-between items-center text-lg">
+                        <span class="font-semibold text-white">✨ Inspiración (I):</span>
+                        <span id="res-inspiracion" class="font-bold text-[#8dff8d]">10/10</span>
+                    </div>
+                    <div class="resource-item flex justify-between items-center text-lg">
+                        <span class="font-semibold text-white">💵 Presupuesto (P):</span>
+                        <span id="res-presupuesto" class="font-bold text-[#f5f58c]">1000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 p-4 bg-[#1a1a2e]/50 rounded-lg border-2 border-dashed border-[#433c67] flex items-center justify-center">
+                <p class="text-xl text-[#a0a0c0]">Área de Juego / Oponente</p>
+            </div>
+
+            <div class="w-full md:w-1/4 p-4 bg-[#3b3558] rounded-lg shadow-inner">
+                <h3 class="text-xl font-bold mb-4 text-[#bae8e8] border-b border-[#5a547b] pb-2">Oponente (<span id="opponent-name">Beta</span>)</h3>
+                <p class="text-sm text-[#a0a0c0]">PB de Oponente (visible):</p>
+                <div id="opponent-scores" class="space-y-2 mt-2 text-sm">
+                    </div>
+            </div>
+        </div>
+
+        <div class="bg-[#1a1a2e] p-4 rounded-lg flex flex-col">
+            <h3 class="text-xl font-bold mb-3 text-[#bae8e8] text-center">Tu Mano (Cartas)</h3>
+            <div id="player-hand" class="flex overflow-x-auto space-x-4 pb-2 justify-center">
+                </div>
+
+            <div class="mt-4 flex justify-center">
+                <button id="btnEndTurn"
+                    class="py-3 px-10 text-xl font-bold rounded-lg bg-[#3dff6b] hover:bg-[#32d45a] text-gray-900 transition duration-200">
+                    FINALIZAR TURNO
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="message-box" class="fixed top-0 left-0 right-0 p-4 bg-yellow-500 text-yellow-900 text-center font-bold hidden">
         ¡Mensaje del juego!
     </div>
 
+    <script src="game_state.js"></script>
     <script src="script.js" defer></script>
 </body>
 </html>
