@@ -1,0 +1,93 @@
+/* Configuraciones de fuente y fondo */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #1a1a2e; /* Fondo oscuro principal */
+    color: #e0e0e0; /* Texto claro */
+}
+/* Animación para el botón de 'Jugar' */
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(255, 71, 87, 0.6);
+}
+/* Estilo visual para los botones secundarios */
+.btn-secondary {
+    transition: all 0.3s ease;
+}
+.btn-secondary:hover {
+    background-color: #38385e; /* Un tono un poco más claro al hacer hover */
+    transform: translateY(-2px);
+}
+
+/* Estilo para el título - Gran impacto visual */
+#game-title {
+    font-size: 4rem; /* Tamaño grande en desktop */
+    font-weight: 900;
+    color: #e94560; /* Color vibrante para el título */
+    text-shadow: 0 0 15px rgba(255, 71, 87, 0.8);
+}
+@media (max-width: 768px) {
+    #game-title {
+        font-size: 2.5rem; /* Ajuste para móviles */
+    }
+}
+
+/* Efecto de cuadrícula (Grid) sutil en el fondo, común en diseño gráfico */
+.design-grid-bg {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+3. Archivo: script.js
+JavaScript
+
+// Función para mostrar mensajes de juego (reemplaza a alert() y confirm())
+function showGameMessage(message) {
+    const msgBox = document.getElementById('message-box');
+    
+    // Si el elemento existe (debería existir en el HTML)
+    if (msgBox) {
+        msgBox.textContent = message;
+        msgBox.classList.remove('hidden');
+
+        // Oculta el mensaje después de 3 segundos
+        setTimeout(() => {
+            msgBox.classList.add('hidden');
+        }, 3000);
+    } else {
+        console.warn("Elemento 'message-box' no encontrado en el DOM.");
+    }
+}
+
+// --- LÓGICA DE EVENTOS ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Escuchar el clic en el botón JUGAR
+    document.getElementById('btnPlay').addEventListener('click', () => {
+        showGameMessage("¡Iniciando Batalla! Cargando el Brief...");
+        // Futura lógica para cargar la pantalla de juego
+    });
+
+    // Escuchar el clic en Colección
+    document.getElementById('btnCollection').addEventListener('click', () => {
+        showGameMessage("Viendo tu portafolio y colección de cartas...");
+        // Futura lógica para ir a la vista de colección
+    });
+
+    // Escuchar el clic en Tutorial
+    document.getElementById('btnTutorial').addEventListener('click', () => {
+        showGameMessage("Accediendo al Tutorial: Aprendiendo a Kerning...");
+        // Futura lógica para el tutorial
+    });
+
+    // Escuchar el clic en Ajustes
+    document.getElementById('btnSettings').addEventListener('click', () => {
+        showGameMessage("Abriendo Ajustes: ¿Quieres cambiar tu paleta de colores?");
+        // Futura lógica para la pantalla de ajustes
+    });
+
+    // Escuchar el clic en Créditos
+    document.getElementById('btnCredits').addEventListener('click', () => {
+        showGameMessage("Diseño inspirado por la comunidad creativa. ¡Gracias!");
+        // Futura lógica para los créditos
+    });
+});
