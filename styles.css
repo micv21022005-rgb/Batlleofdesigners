@@ -37,7 +37,43 @@ body {
                       linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
 }
-niciando Batalla! Cargando el Brief...");
-        // Futura lógica para cargar la pantalla de juego
- 
+
+/* --- ESTILOS ESPECÍFICOS DEL TABLERO DE JUEGO --- */
+
+#game-screen {
+    /* Asegura que la pantalla de juego ocupe el espacio disponible */
+    height: 95vh;
+}
+
+.card {
+    width: 150px; /* Ancho fijo para las cartas */
+    min-width: 150px;
+    height: 220px;
+    background-color: #3b3558;
+    border: 3px solid #ff6584; /* Borde de color de marca */
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    user-select: none;
+    position: relative;
+    padding: 10px;
+}
+
+.card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 15px rgba(255, 101, 132, 0.4);
+}
+
+.card-cost {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.cost-chip {
+    padding: 2px 6px;
+    border-radius: 9999px; /* rounded-full */
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 700; /* font-bold */
 }
