@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle of Designers | Menú Principal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="design-grid-bg min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-lg bg-[#272343] p-8 md:p-12 rounded-xl shadow-2xl border border-[#433c67] text-center">
+
+        <h1 id="game-title" class="mb-8 uppercase tracking-widest leading-none">
+            Battle of Designers
+        </h1>
+        <p class="text-sm md:text-base mb-10 text-[#bae8e8]">
+            La Batalla de Creatividad y Estrategia. ¡Gana el Brief!
+        </p>
+
+        <div class="space-y-4">
+            <button id="btnPlay"
+                class="btn-primary w-full py-4 text-xl font-bold rounded-lg shadow-lg
+                       bg-[#ff6584] hover:bg-[#ff4757] text-white transition duration-300 ease-in-out
+                       flex items-center justify-center space-x-3 transform">
+                <script>
+                    document.write(lucide.createIcons().feather.toSvg({ name: 'pen-tool', class: 'w-6 h-6' }));
+                </script>
+                <span>JUGAR / EMPEZAR BATALLA</span>
+            </button>
+
+            <button id="btnCollection"
+                class="btn-secondary w-full py-3 text-lg font-semibold rounded-lg
+                       bg-[#3b3558] text-[#bae8e8] border border-[#5a547b]">
+                <script>
+                    document.write(lucide.createIcons().layers.toSvg({ name: 'layers', class: 'w-5 h-5 inline-block mr-2' }));
+                </script>
+                Colección de Cartas
+            </button>
+
+            <button id="btnTutorial"
+                class="btn-secondary w-full py-3 text-lg font-semibold rounded-lg
+                       bg-[#3b3558] text-[#bae8e8] border border-[#5a547b]">
+                <script>
+                    document.write(lucide.createIcons().book.toSvg({ name: 'book', class: 'w-5 h-5 inline-block mr-2' }));
+                </script>
+                Tutorial y Briefs
+            </button>
+        </div>
+
+        <div class="mt-8 flex justify-center space-x-6">
+            <button id="btnSettings"
+                class="btn-secondary p-3 rounded-full bg-[#3b3558] hover:bg-[#5a547b] transition duration-200"
+                title="Ajustes">
+                <script>
+                    document.write(lucide.createIcons().settings.toSvg({ name: 'settings', class: 'w-6 h-6' }));
+                </script>
+            </button>
+
+            <button id="btnCredits"
+                class="btn-secondary p-3 rounded-full bg-[#3b3558] hover:bg-[#5a547b] transition duration-200"
+                title="Créditos">
+                <script>
+                    document.write(lucide.createIcons().info.toSvg({ name: 'info', class: 'w-6 h-6' }));
+                </script>
+            </button>
+        </div>
+
+        <p class="text-xs text-[#a0a0c0] mt-8">
+            Versión Alpha 0.1 | Desarrollado por Gemini
+        </p>
+    </div>
+
+    <div id="message-box" class="fixed top-0 left-0 right-0 p-4 bg-yellow-500 text-yellow-900 text-center font-bold hidden">
+        ¡Mensaje del juego!
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
