@@ -46,7 +46,12 @@ function switchView(targetId) {
 
     // Lógica especial al entrar a la Colección
     if (targetId === 'collection-screen') {
-        renderAllCards(GAME_STATE.cardDefinitions);
+        // Llama a la función del archivo collection_logic.js para renderizar
+        if (typeof renderAllCards === 'function') {
+            renderAllCards(GAME_STATE.cardDefinitions);
+        } else {
+            console.error("Error: La función renderAllCards no está disponible.");
+        }
     }
 }
 
