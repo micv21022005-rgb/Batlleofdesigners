@@ -34,7 +34,10 @@ function createCardElement(cardKey, cardDef, playerResources = null, clickHandle
             
             const chipColor = COST_COLOR_MAP[res].color;
             const symbol = COST_COLOR_MAP[res].symbol;
-            costChips += `<span class="cost-chip ${chipColor} ${isAffordable ? '' : 'opacity-50 line-through'}" title="${cost} ${res}">${symbol} ${cost}</span>`;
+            // Para presupuesto, mostramos el costo con el símbolo de dinero
+            const costDisplay = res === 'presupuesto' ? `$${cost}` : cost;
+            
+            costChips += `<span class="cost-chip ${chipColor} ${isAffordable ? '' : 'opacity-50 line-through'}" title="${cost} ${res}">${symbol} ${costDisplay}</span>`;
         }
     }
 
@@ -45,7 +48,7 @@ function createCardElement(cardKey, cardDef, playerResources = null, clickHandle
         cardElement.classList.add('playable-card');
     } else {
         // Estilo para cartas de solo visualización (Colección)
-        cardElement.classList.add('border-[#3dff6b]', 'cursor-default'); 
+        cardElement.classList.add('border-none'); 
         cardElement.classList.remove('card:hover'); 
     }
     
