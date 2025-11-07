@@ -4,21 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battle of Designers | Menú Principal</title>
-    <!-- Carga de Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carga de Lucide Icons (Iconografía) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
-    <!-- Enlace a nuestro archivo de estilos CSS personalizado -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="design-grid-bg min-h-screen flex items-center justify-center p-4">
 
-    <!-- 1. PANTALLA DE MENÚ (Inicialmente visible) -->
     <div id="menu-screen" class="view-screen w-full max-w-lg bg-[#272343] p-8 md:p-12 rounded-xl shadow-2xl border border-[#433c67] text-center">
 
-        <!-- Título del Juego -->
         <h1 id="game-title" class="mb-8 uppercase tracking-widest leading-none">
             Battle of Designers
         </h1>
@@ -26,21 +21,17 @@
             La Batalla de Creatividad y Estrategia. ¡Gana el Brief!
         </p>
 
-        <!-- Botones de Acción Principales -->
         <div class="space-y-4">
-            <!-- Botón JUGAR (Principal) -->
             <button id="btnPlay"
                 class="btn-primary w-full py-4 text-xl font-bold rounded-lg shadow-lg
                        bg-[#ff6584] hover:bg-[#ff4757] text-white transition duration-300 ease-in-out
                        flex items-center justify-center space-x-3 transform">
-                <!-- Icono de Pluma (Pen Tool) -->
                 <script>
                     document.write(lucide.createIcons().feather.toSvg({ name: 'pen-tool', class: 'w-6 h-6' }));
                 </script>
                 <span>JUGAR / EMPEZAR BATALLA</span>
             </button>
 
-            <!-- Botones Secundarios: Colección (Ahora funcional) -->
             <button id="btnCollection"
                 class="btn-secondary w-full py-3 text-lg font-semibold rounded-lg
                        bg-[#3b3558] text-[#bae8e8] border border-[#5a547b]">
@@ -50,7 +41,6 @@
                 Colección de Cartas
             </button>
 
-            <!-- Botones Secundarios -->
             <button id="btnTutorial"
                 class="btn-secondary w-full py-3 text-lg font-semibold rounded-lg
                        bg-[#3b3558] text-[#bae8e8] border border-[#5a547b]">
@@ -61,7 +51,6 @@
             </button>
         </div>
 
-        <!-- Opciones de Configuración (Fila inferior) -->
         <div class="mt-8 flex justify-center space-x-6">
             <button id="btnSettings"
                 class="btn-secondary p-3 rounded-full bg-[#3b3558] hover:bg-[#5a547b] transition duration-200"
@@ -80,40 +69,44 @@
             </button>
         </div>
 
-        <!-- Mensaje de Estado / Versión -->
         <p class="text-xs text-[#a0a0c0] mt-8">
-            Versión Alpha 0.1 | Desarrollado por DBM
+            Versión Alpha 0.1 | Desarrollado por Gemini
         </p>
     </div>
 
-    <!-- 2. PANTALLA DE JUEGO (Oculta) -->
     <div id="game-screen" class="view-screen hidden w-full max-w-7xl h-full flex flex-col bg-[#272343]/90 rounded-xl shadow-2xl p-4 md:p-6 transition-opacity duration-500">
         
-        <!-- Contenido del Tablero (sin cambios) -->
         <div id="status-bar" class="flex flex-col md:flex-row justify-between items-center mb-6 p-3 bg-[#1a1a2e] rounded-lg border border-[#433c67]">
-            <div class="text-xl font-bold text-[#bae8e8] mb-2 md:mb-0">
-                Turno: <span id="turn-count">1</span> | Jugador: <span id="current-player-name">Alpha</span>
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <div class="text-xl font-bold text-[#bae8e8]">
+                    Turno: <span id="turn-count">1</span>/<span id="max-turn-count">10</span> | Jugador: <span id="current-player-name">Alpha</span>
+                </div>
+                <div id="leader-indicator" class="text-sm font-semibold py-1 px-3 rounded-full bg-[#ff6584] text-white transition-all duration-300">
+                    Líder: N/A
+                </div>
             </div>
             
-            <div id="brief-scorecard" class="flex space-x-4 text-center text-sm md:text-base">
+            <div id="brief-scorecard" class="flex space-x-4 text-center text-sm md:text-base mt-2 md:mt-0">
                 <div class="score-item">
                     <span class="text-[#ff6584] font-bold">Impacto Visual</span>
-                    <div class="current-score" id="score-impacto">0/10</div>
+                    <div class="current-score" id="score-impacto">0/5</div>
                 </div>
                 <div class="score-item">
                     <span class="text-[#8dff8d] font-bold">Usabilidad/UX</span>
-                    <div class="current-score" id="score-usabilidad">0/8</div>
+                    <div class="current-score" id="score-usabilidad">0/4</div>
                 </div>
                 <div class="score-item">
                     <span class="text-[#8d8dff] font-bold">Cohesión Marca</span>
-                    <div class="current-score" id="score-cohesion">0/5</div>
+                    <div class="current-score" id="score-cohesion">0/3</div>
                 </div>
             </div>
         </div>
 
         <div class="flex-grow flex flex-col md:flex-row gap-6 mb-6">
+            
             <div class="w-full md:w-1/4 p-4 bg-[#3b3558] rounded-lg shadow-inner">
                 <h3 class="text-xl font-bold mb-4 text-[#bae8e8] border-b border-[#5a547b] pb-2">Recursos</h3>
+                
                 <div id="resources-list" class="space-y-3">
                     <div class="resource-item flex justify-between items-center text-lg">
                         <span class="font-semibold text-white">⏱️ Tiempo (T):</span>
@@ -145,7 +138,7 @@
         <div class="bg-[#1a1a2e] p-4 rounded-lg flex flex-col">
             <h3 class="text-xl font-bold mb-3 text-[#bae8e8] text-center">Tu Mano (Cartas)</h3>
             <div id="player-hand" class="flex overflow-x-auto space-x-4 pb-2 justify-center">
-            </div>
+                </div>
 
             <div class="mt-4 flex justify-center">
                 <button id="btnEndTurn"
@@ -156,10 +149,8 @@
         </div>
     </div>
     
-    <!-- 3. PANTALLA DE COLECCIÓN DE CARTAS (Oculta) -->
     <div id="collection-screen" class="view-screen hidden w-full max-w-7xl h-[95vh] flex flex-col bg-[#272343]/90 rounded-xl shadow-2xl p-6 transition-opacity duration-500">
         
-        <!-- Header -->
         <div class="flex justify-between items-center mb-6 border-b border-[#433c67] pb-3">
             <h2 class="text-3xl font-bold text-[#ff6584]">Portafolio de Cartas</h2>
             <button id="btnCollectionBack" class="btn-secondary py-2 px-4 rounded-lg bg-[#3b3558] text-[#bae8e8] border border-[#5a547b] hover:bg-[#5a547b]">
@@ -170,20 +161,16 @@
             </button>
         </div>
 
-        <!-- Contenedor de Cartas -->
         <div id="all-cards-container" class="flex-grow overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-6 p-4">
-            <!-- Las cartas se renderizarán aquí mediante JavaScript -->
             <p class="text-center col-span-full text-lg text-[#a0a0c0]">Cargando Portafolio...</p>
         </div>
 
     </div>
 
-    <!-- Contenedor para mensajes de juego (en lugar de alert()) -->
-    <div id="message-box" class="fixed top-0 left-0 right-0 p-4 bg-yellow-500 text-yellow-900 text-center font-bold hidden">
+    <div id="message-box" class="fixed top-0 left-0 right-0 p-4 text-center font-bold hidden">
         ¡Mensaje del juego!
     </div>
 
-    <!-- Enlace a nuestros scripts -->
     <script src="game_state.js"></script>
     <script src="collection_logic.js"></script>
     <script src="script.js" defer></script>
