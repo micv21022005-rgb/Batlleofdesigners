@@ -158,29 +158,58 @@ function updateUI() {
     checkLeadership(); // Chequea y muestra el liderazgo al final de cada acción
 }
 
+// --- LÓGICA DEL MODAL DE FIN DE PARTIDA ---
+
+function showGameOverModal(title, message, icon) {
+    // Asegurarse de que el icono de lucide esté disponible antes de insertarlo
+    const iconSvg = typeof lucide !== 'undefined' && lucide.createIcons()[icon] ? lucide.createIcons()[icon].toSvg({ name: icon, class: 'w-16 h-16 mx-auto text-yellow-400' }) : `<div class="text-7xl">🏆</div>`;
+    
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-message').textContent = message;
+    document.getElementById('modal-content-icon').innerHTML = iconSvg;
+    document.getElementById('game-over-modal').classList.remove('hidden');
+}
+
+function hideGameOverModal() {
+    document.getElementById('game-over-modal').classList.add('hidden');
+}
+
+
 // --- LÓGICA DE JUEGO CENTRAL ---
 
 function handleGameEnd(winner) {
     gameIsOver = true;
     document.getElementById('btnEndTurn').disabled = true;
 
+    let modalTitle = "¡FIN DEL BRIEF!";
+    let modalMessage = "";
+    let modalIcon = 'trophy'; // Icono por defecto (trofeo)
+
     if (winner) {
-        showGameMessage(`🎉 ¡FIN DE PARTIDA! ${winner.name} ha completado el Brief y GANA!`, 'success');
+        modalTitle = "¡BRIEF CUMPLIDO!";
+        modalMessage = `${winner.name} ha alcanzado todos los objetivos y GANA la Batalla de Diseño.`;
+        modalIcon = 'award'; 
     } else {
         const score1 = calculateTotalScore('player1');
         const score2 = calculateTotalScore('player2');
-        let finalWinner = '';
-
+        
         if (score1 > score2) {
-            finalWinner = GAME_STATE.player1.name;
+            const finalWinner = GAME_STATE.player1.name;
+            modalMessage = `El tiempo se ha agotado. ¡${finalWinner} gana por mayor puntuación total (PB)!`;
+            modalIcon = 'trending-up';
         } else if (score2 > score1) {
-            finalWinner = GAME_STATE.player2.name;
+            const finalWinner = GAME_STATE.player2.name;
+            modalMessage = `El tiempo se ha agotado. ¡${finalWinner} gana por mayor puntuación total (PB)!`;
+            modalIcon = 'trending-up';
         } else {
-            finalWinner = 'Nadie (¡EMPATE!)';
+            modalTitle = "¡EMPATE TÉCNICO!";
+            modalMessage = 'El tiempo se acabó y ambos diseñadores tienen la misma puntuación de Brief. ¡Es un empate!';
+            modalIcon = 'zap';
         }
-
-        showGameMessage(`⏱️ ¡FIN DE PARTIDA por límite de turnos! El ganador por Puntos de Brief es: ${finalWinner}`, 'info');
     }
+    
+    // Muestra el modal de fin de partida
+    showGameOverModal(modalTitle, modalMessage, modalIcon);
 }
 
 function checkVictory(player) {
@@ -226,7 +255,7 @@ function applyCardEffects(cardDef, playerKey) {
             player.extraRegen[effect.target] += effect.value;
             showGameMessage(`¡${player.name} obtiene +${effect.value} ${effect.target} extra el próximo turno!`, 'info');
         } else if (effect.type === "resource_immediate") {
-            // NUEVO: Ganancia inmediata de recurso (usado para presupuesto)
+            // Ganancia inmediata de recurso (usado para presupuesto)
             player.resources[effect.target] += effect.value;
             // Mostrar la ganancia de presupuesto con formato de dinero
             if (effect.target === 'presupuesto') {
@@ -367,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
         GAME_STATE = JSON.parse(JSON.stringify(INITIAL_GAME_STATE)); 
         gameIsOver = false;
         document.getElementById('btnEndTurn').disabled = false;
+        hideGameOverModal(); // Asegura que el modal esté oculto al iniciar
     }
 
     resetGame(); // Inicializa el estado al cargar
@@ -397,4 +427,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnTutorial').addEventListener('click', () => showGameMessage("Accediendo al Tutorial: Aprendiendo a Kerning...", 'info'));
     document.getElementById('btnSettings').addEventListener('click', () => showGameMessage("Abriendo Ajustes: ¿Quieres cambiar tu paleta de colores?", 'info'));
     document.getElementById('btnCredits').addEventListener('click', () => showGameMessage("Diseño inspirado por la comunidad creativa. ¡Gracias!", 'info'));
+
+    // --- NUEVOS LISTENERS PARA EL MODAL DE FIN DE PARTIDA ---
+    document.getElementById('btnModalRestart').addEventListener('click', () => {
+        hideGameOverModal();
+        resetGame(); // Reinicia el estado del juego
+        switchView('game-screen'); // Vuelve a la pantalla de juego
+        updateUI(); 
+        showGameMessage("¡Partida Reiniciada! Un nuevo Brief ha llegado.");
+    });
+
+    document.getElementById('btnModalMenu').addEventListener('click', () => {
+        hideGameOverModal();
+        switchView('menu-screen'); // Vuelve al menú principal
+    });
 });
