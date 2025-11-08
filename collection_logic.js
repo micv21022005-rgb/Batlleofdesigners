@@ -1,139 +1,140 @@
 /**
  * collection_logic.js
- * Contiene funciones para renderizar visualmente las cartas.
- * Se utiliza en la mano del jugador (script.js) y en la vista de colección (index.html).
+ * Contiene funciones para el renderizado visual de elementos de cartas,
+ * utilizado tanto para la mano del jugador como para la pantalla de colección.
+ * * Depende de:
+ * - lucide: Para la iconografía.
+ * - GAME_STATE.cardDefinitions: Para obtener los datos de la carta.
  */
 
-const COST_COLOR_MAP = {
-    tiempo: { color: 'bg-[#ff6584] text-white', symbol: '⏱️' },
-    inspiracion: { color: 'bg-[#8dff8d] text-gray-900', symbol: '✨' },
-    presupuesto: { color: 'bg-[#f5f5f5] text-gray-900', symbol: '💵' } // Color ajustado para el presupuesto
+// Símbolos de Recursos
+const RESOURCE_SYMBOLS = {
+    tiempo: '⏱️ T',
+    inspiracion: '✨ I',
+    presupuesto: '💵 P'
+};
+
+// Clases de color para los chips de costo
+const RESOURCE_COLORS = {
+    tiempo: 'bg-[#ff6584] text-white',      // Rojo/Rosa
+    inspiracion: 'bg-[#8dff8d] text-gray-900', // Verde brillante
+    presupuesto: 'bg-[#f5f58c] text-gray-900'   // Amarillo claro
 };
 
 /**
- * Genera una descripción detallada de los efectos de la carta para el portafolio.
- * @param {object} effect - El objeto effect de la definición de la carta.
- * @returns {string} Una cadena HTML formateada con los efectos.
+ * Crea un chip de costo visual.
+ * @param {string} resourceName - Nombre del recurso ('tiempo', 'inspiracion', 'presupuesto').
+ * @param {number} cost - Cantidad de recurso requerido.
+ * @returns {string} HTML del chip.
  */
-function getEffectDescription(effect) {
-    const listItems = [];
+function createCostChip(resourceName, cost) {
+    if (cost <= 0) return '';
 
-    const processSingleEffect = (eff) => {
-        let description = '';
-        if (eff.type === "score") {
-            const scoreMap = {
-                impactoVisual: 'Impacto Visual (IV)',
-                usabilidadUX: 'Usabilidad/UX (UX)',
-                cohesionMarca: 'Cohesión Marca (CM)'
-            };
-            description = `➕ ${eff.value} PB en ${scoreMap[eff.target]}.`;
-        } else if (eff.type === "draw") {
-            description = `➕ Roba ${eff.value} carta.`;
-        } else if (eff.type === "resource_gain") {
-            description = `➕ ${eff.value} ${eff.target} extra en el siguiente turno.`;
-        } else if (eff.type === "resource_immediate") {
-            const value = eff.target === 'presupuesto' ? `$${eff.value}` : eff.value;
-            description = `➕ Gana ${value} ${eff.target} al instante.`;
-        }
-        listItems.push(`<li>${description}</li>`);
-    };
+    const symbol = RESOURCE_SYMBOLS[resourceName] || resourceName;
+    const color = RESOURCE_COLORS[resourceName] || 'bg-gray-500 text-white';
 
-    if (effect.type === "multiple") {
-        effect.effects.forEach(processSingleEffect);
-    } else {
-        processSingleEffect(effect);
-    }
-    
-    // Si hay un efecto secundario (sideEffect), también lo procesamos
-    if (effect.sideEffect) {
-        processSingleEffect(effect.sideEffect);
-    }
-
-    return `<ul class="list-disc list-inside text-xs text-left mt-2 text-green-300 font-semibold">${listItems.join('')}</ul>`;
+    return `
+        <div class="cost-chip ${color}">
+            ${cost} ${symbol}
+        </div>
+    `;
 }
 
-
 /**
- * Crea el elemento HTML de una carta dado su definición.
- * @param {string} cardKey - La clave de la carta (ej: "Ajuste_Kerning").
- * @param {object} cardDef - La definición de la carta del game_state.
- * @param {object} playerResources - Los recursos del jugador (opcional, para habilitar/deshabilitar).
- * @param {function} clickHandler - La función a ejecutar al hacer clic (opcional).
- * @returns {HTMLElement} El div de la carta.
+ * Crea el elemento DOM completo de una carta.
+ * Esta función es esencial para renderizar tanto la mano como la colección.
+ * @param {string} cardKey - La clave única de la carta (ej: "Ajuste_Kerning").
+ * @param {object} cardDef - La definición de la carta desde cardDefinitions.
+ * @param {object} [playerResources=null] - Recursos del jugador actual (solo para cartas en mano).
+ * @param {function} [clickCallback=null] - Función a ejecutar al hacer click (solo para cartas en mano).
+ * @returns {HTMLElement} Elemento div de la carta.
  */
-function createCardElement(cardKey, cardDef, playerResources = null, clickHandler = null) {
+function createCardElement(cardKey, cardDef, playerResources = null, clickCallback = null) {
     const cardElement = document.createElement('div');
-    cardElement.className = 'card rounded-lg shadow-xl flex flex-col justify-between';
-    cardElement.setAttribute('data-card-id', cardKey);
-    
-    let canAfford = true;
-    let costChips = '';
+    cardElement.dataset.cardKey = cardKey;
 
-    // Generar chips de costo y verificar si se puede pagar
-    for (const [res, cost] of Object.entries(cardDef.cost)) {
-        if (cost > 0) {
-            const isAffordable = playerResources ? playerResources[res] >= cost : true;
-            if (!isAffordable) canAfford = false;
-            
-            const chip = COST_COLOR_MAP[res];
-            const costDisplay = res === 'presupuesto' ? `$${cost}` : cost;
-            
-            costChips += `<span class="cost-chip ${chip.color} ${isAffordable ? '' : 'opacity-50 line-through'}" title="${cost} ${res}">${chip.symbol} ${costDisplay}</span>`;
+    let isPlayable = true;
+    let tooltip = '';
+    let cardClass = 'card rounded-xl shadow-lg transition duration-200';
+
+    if (playerResources && clickCallback) {
+        // Lógica para cartas en la mano
+        for (const [res, cost] of Object.entries(cardDef.cost)) {
+            if (playerResources[res] < cost) {
+                isPlayable = false;
+                tooltip = ` title="Recursos insuficientes"`;
+                break;
+            }
         }
+        cardClass += isPlayable ? ' playable-card' : ' opacity-50 cursor-not-allowed border-red-500';
+        
+        if (isPlayable) {
+            cardElement.addEventListener('click', () => clickCallback(cardKey));
+        }
+
+    } else {
+        // Lógica para cartas en la colección (solo visualización)
+        cardClass += ' border-none';
     }
 
-    if (!canAfford && playerResources) {
-        cardElement.classList.add('opacity-70', 'cursor-not-allowed', 'hover:transform-none', 'hover:shadow-none');
-    } else if (clickHandler) {
-        cardElement.addEventListener('click', () => clickHandler(cardKey));
-        cardElement.classList.add('playable-card');
-    } else {
-        // Estilo para cartas de solo visualización (Colección)
-        cardElement.classList.add('border-none'); 
-        cardElement.classList.remove('card:hover'); 
+    // Generar los chips de costo
+    let costHtml = '';
+    for (const [res, cost] of Object.entries(cardDef.cost)) {
+        costHtml += createCostChip(res, cost);
     }
-    
-    // Obtener la descripción detallada de los efectos
-    const detailedEffects = getEffectDescription(cardDef.effect);
+
+    // Determinar la clase de color para el nombre de la carta según su impacto principal (primer efecto)
+    let titleColor = 'text-[#bae8e8]';
+    let mainEffectTarget = cardDef.effect.target || (cardDef.effect.effects && cardDef.effect.effects[0].target);
+
+    if (mainEffectTarget === 'impactoVisual') {
+        titleColor = 'text-[#ff6584]'; // Rojo
+    } else if (mainEffectTarget === 'usabilidadUX') {
+        titleColor = 'text-[#8dff8d]'; // Verde
+    } else if (mainEffectTarget === 'cohesionMarca') {
+        titleColor = 'text-[#8d8dff]'; // Azul
+
+    } else if (cardDef.effect.type === 'resource_immediate' || cardDef.effect.type === 'resource_gain') {
+        titleColor = 'text-[#f5f58c]'; // Amarillo (Recurso)
+    }
+
 
     // Contenido HTML de la carta
     cardElement.innerHTML = `
-        <div>
-            <h4 class="text-lg font-bold text-white mb-1">${cardDef.name}</h4>
-            <p class="text-[10px] text-[#a0a0c0] uppercase">${cardDef.description}</p>
-            <div class="card-cost mt-2">${costChips}</div>
+        <div class="flex flex-col h-full" ${tooltip}>
+            <h4 class="text-sm font-bold leading-tight mb-2 ${titleColor}">${cardDef.name}</h4>
             
-            <div class="mt-2 p-2 bg-[#272343] rounded-md border border-green-700/50">
-                <p class="text-xs font-bold text-green-400">Efectos al Jugar:</p>
-                ${detailedEffects}
+            <div class="card-cost">${costHtml}</div>
+            
+            <p class="text-xs text-gray-300 flex-grow">${cardDef.description}</p>
+            
+            <div class="absolute bottom-1 right-1 p-1 bg-[#1a1a2e] rounded-tl-lg text-xs font-black text-white">
+                ${cardDef.effect.type === 'score' ? `+${cardDef.effect.value} PB` : cardDef.effect.type === 'multiple' ? `Efecto Múltiple` : `Recurso`}
             </div>
         </div>
-        <p class="text-xs text-right text-[#a0a0c0] font-mono mt-2">${cardKey}</p>
     `;
 
+    cardElement.className = cardClass;
     return cardElement;
 }
 
 /**
- * Renderiza todas las cartas en la vista de colección.
- * Esta función es llamada cuando el usuario accede al "Portafolio de Cartas".
+ * Renderiza todas las cartas disponibles en la pantalla de colección.
+ * @param {object} cardDefinitions - El objeto completo de definiciones de cartas.
  */
 function renderAllCards(cardDefinitions) {
     const container = document.getElementById('all-cards-container');
-    if (!container) return;
+    container.innerHTML = ''; // Limpia el contenedor
 
-    container.innerHTML = '';
-    
-    const cardKeys = Object.keys(cardDefinitions).sort(); // Ordenar alfabéticamente
-    
+    // Obtener las claves y ordenar por nombre para una mejor visualización
+    const cardKeys = Object.keys(cardDefinitions).sort((a, b) => 
+        cardDefinitions[a].name.localeCompare(cardDefinitions[b].name)
+    );
+
     cardKeys.forEach(cardKey => {
         const cardDef = cardDefinitions[cardKey];
-        // En la colección, no pasamos recursos ni handler, solo la definición
-        const cardElement = createCardElement(cardKey, cardDef); 
+        // Crear la carta sin recursos ni callback (solo visualización)
+        const cardElement = createCardElement(cardKey, cardDef);
         container.appendChild(cardElement);
     });
-
-    if (cardKeys.length === 0) {
-        container.innerHTML = '<p class="text-center col-span-full text-lg text-red-400">¡Error! No se encontraron definiciones de cartas.</p>';
-    }
 }
