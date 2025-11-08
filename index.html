@@ -70,7 +70,7 @@
         </div>
 
         <p class="text-xs text-[#a0a0c0] mt-8">
-            Versión Alpha 0.1 | Desarrollado por DBM
+            Versión Alpha 0.1 | Desarrollado por Gemini
         </p>
     </div>
 
@@ -169,6 +169,33 @@
 
     <div id="message-box" class="fixed top-0 left-0 right-0 p-4 text-center font-bold hidden">
         ¡Mensaje del juego!
+    </div>
+
+    <div id="game-over-modal" class="fixed inset-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#272343] border-4 border-[#ff6584] rounded-xl shadow-2xl p-8 md:p-12 text-center max-w-md w-full animate-fadeInUp">
+            <h2 id="modal-title" class="text-4xl font-black mb-4 text-[#bae8e8] uppercase tracking-wider"></h2>
+            
+            <div id="modal-content-icon" class="mb-6 text-6xl"></div>
+            
+            <p id="modal-message" class="text-xl text-[#ff6584] font-semibold mb-8"></p>
+            
+            <div class="space-y-4">
+                <button id="btnModalRestart"
+                    class="btn-primary w-full py-3 text-lg font-bold rounded-lg bg-[#8dff8d] hover:bg-[#6cff6c] text-gray-900 transition duration-300 ease-in-out flex items-center justify-center space-x-2">
+                    <script>
+                        document.write(lucide.createIcons().rotateCw.toSvg({ name: 'rotate-cw', class: 'w-5 h-5' }));
+                    </script>
+                    <span>Reiniciar Partida</span>
+                </button>
+                <button id="btnModalMenu"
+                    class="btn-secondary w-full py-3 text-lg font-semibold rounded-lg bg-[#3b3558] text-[#bae8e8] border border-[#5a547b] hover:bg-[#5a547b]">
+                    <script>
+                        document.write(lucide.createIcons().home.toSvg({ name: 'home', class: 'w-5 h-5' }));
+                    </script>
+                    Volver al Menú Principal
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="game_state.js"></script>
