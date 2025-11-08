@@ -106,12 +106,21 @@ function renderHand(playerKey) {
     const player = GAME_STATE[playerKey];
     const definitions = GAME_STATE.cardDefinitions;
 
-    player.hand.forEach(cardKey => {
-        const cardDef = definitions[cardKey];
-        // Usamos la función del archivo collection_logic para crear el elemento
-        const cardElement = createCardElement(cardKey, cardDef, player.resources, playCard);
-        handContainer.appendChild(cardElement);
-    });
+    if (playerKey === 'player1') { // Solo renderizar la mano del jugador humano
+        player.hand.forEach(cardKey => {
+            const cardDef = definitions[cardKey];
+            const cardElement = createCardElement(cardKey, cardDef, player.resources, playCard);
+            handContainer.appendChild(cardElement);
+        });
+    } else {
+        // Mano del oponente: solo mostrar el reverso de las cartas
+        for(let i = 0; i < player.hand.length; i++) {
+            const hiddenCard = document.createElement('div');
+            hiddenCard.className = 'card rounded-xl shadow-lg bg-[#5a547b] border-4 border-[#3b3558] flex items-center justify-center text-lg font-bold text-[#bae8e8]';
+            hiddenCard.textContent = 'BETA';
+            handContainer.appendChild(hiddenCard);
+        }
+    }
 }
 
 /**
@@ -212,8 +221,8 @@ function handleGameEnd(winner) {
     showGameOverModal(modalTitle, modalMessage, modalIcon);
 }
 
-function checkVictory(player) {
-    const scores = GAME_STATE[player].scores;
+function checkVictory(playerKey) {
+    const scores = GAME_STATE[playerKey].scores;
     const thresholds = GAME_STATE.game.victoryThresholds;
 
     return (
@@ -230,12 +239,17 @@ function applyCardEffects(cardDef, playerKey) {
     const executeEffect = (effect) => {
         if (effect.type === "score") {
             player.scores[effect.target] += effect.value;
-            showGameMessage(`¡${player.name} gana +${effect.value} PB en ${effect.target}!`, 'success');
+            // Solo mostrar mensajes detallados para el jugador humano
+            if (playerKey === 'player1') {
+                showGameMessage(`¡${player.name} gana +${effect.value} PB en ${effect.target}!`, 'success');
+            }
         } else if (effect.type === "draw") {
             const cardToDraw = player.deck.pop();
             if (cardToDraw) {
                 player.hand.push(cardToDraw);
-                showGameMessage(`¡${player.name} roba 1 carta!`, 'info');
+                if (playerKey === 'player1') {
+                    showGameMessage(`¡${player.name} roba 1 carta!`, 'info');
+                }
             } else {
                 // Si no hay mazo, barajamos el descarte y robamos
                 if (player.discard.length > 0) {
@@ -245,23 +259,31 @@ function applyCardEffects(cardDef, playerKey) {
                     player.deck.sort(() => Math.random() - 0.5); 
                     const cardToDraw = player.deck.pop();
                     if (cardToDraw) player.hand.push(cardToDraw);
-                    showGameMessage("¡Barajando y Robando! El juego continúa.", 'info');
+                    if (playerKey === 'player1') {
+                        showGameMessage("¡Barajando y Robando! El juego continúa.", 'info');
+                    }
                 } else {
-                     showGameMessage("El mazo y el descarte están vacíos. No hay cartas para robar.", 'error');
+                     if (playerKey === 'player1') {
+                        showGameMessage("El mazo y el descarte están vacíos. No hay cartas para robar.", 'error');
+                     }
                 }
             }
         } else if (effect.type === "resource_gain") {
             // Recurso extra para el próximo turno
             player.extraRegen[effect.target] += effect.value;
-            showGameMessage(`¡${player.name} obtiene +${effect.value} ${effect.target} extra el próximo turno!`, 'info');
+            if (playerKey === 'player1') {
+                showGameMessage(`¡${player.name} obtiene +${effect.value} ${effect.target} extra el próximo turno!`, 'info');
+            }
         } else if (effect.type === "resource_immediate") {
             // Ganancia inmediata de recurso (usado para presupuesto)
             player.resources[effect.target] += effect.value;
             // Mostrar la ganancia de presupuesto con formato de dinero
-            if (effect.target === 'presupuesto') {
-                 showGameMessage(`¡${player.name} gana $${effect.value} USD de ${effect.target}!`, 'success');
-            } else {
-                showGameMessage(`¡${player.name} gana +${effect.value} ${effect.target} al instante!`, 'success');
+            if (playerKey === 'player1') {
+                 if (effect.target === 'presupuesto') {
+                    showGameMessage(`¡${player.name} gana $${effect.value} USD de ${effect.target}!`, 'success');
+                } else {
+                    showGameMessage(`¡${player.name} gana +${effect.value} ${effect.target} al instante!`, 'success');
+                }
             }
         }
     };
@@ -298,8 +320,11 @@ function playCard(cardKey) {
     }
 
     if (!canAfford) {
-        showGameMessage("No tienes suficientes recursos para jugar esta carta.", 'error');
-        return;
+        // Solo el jugador humano debería ver este mensaje
+        if (playerKey === 'player1') {
+            showGameMessage("No tienes suficientes recursos para jugar esta carta.", 'error');
+        }
+        return false; // Retorna false para indicar que no se jugó la carta
     }
 
     // 2. Aplicar Costo
@@ -324,24 +349,136 @@ function playCard(cardKey) {
     
     // 6. Actualizar UI
     updateUI();
+    return true; // Retorna true para indicar que la carta se jugó con éxito
+}
+
+// --- LÓGICA DE INTELIGENCIA ARTIFICIAL (AI) ---
+
+/**
+ * Lógica de decisión del oponente (Diseñador Beta).
+ * Intenta jugar hasta 3 cartas por turno.
+ */
+function aiTurn() {
+    const aiKey = 'player2';
+    const aiPlayer = GAME_STATE[aiKey];
+    const definitions = GAME_STATE.cardDefinitions;
+    let cardsPlayedCount = 0;
+    const maxCardsToPlay = 3;
+
+    showGameMessage(`${aiPlayer.name} (Beta) está diseñando...`, 'info');
+
+    const tryPlayCard = (cardKey) => {
+        // Ejecuta la lógica central de playCard
+        const played = playCard(cardKey);
+        if (played) {
+            cardsPlayedCount++;
+            return true;
+        }
+        return false;
+    };
+
+    // La IA intentará jugar cartas hasta 3 veces o hasta que no pueda pagar.
+    while (cardsPlayedCount < maxCardsToPlay && aiPlayer.hand.length > 0) {
+        
+        // 1. Identificar objetivos faltantes y la distancia
+        const missingScores = {};
+        const scores = aiPlayer.scores;
+        const thresholds = GAME_STATE.game.victoryThresholds;
+        let isMissingAnyScore = false;
+
+        for (const target in thresholds) {
+            const needed = thresholds[target] - scores[target];
+            if (needed > 0) {
+                missingScores[target] = needed;
+                isMissingAnyScore = true;
+            }
+        }
+        
+        // Si ya ganó, sal del bucle
+        if (!isMissingAnyScore) break; 
+
+        // 2. Estrategia de Priorización
+        let bestCardKey = null;
+
+        // Recorre la mano para encontrar la mejor carta que la IA pueda pagar.
+        for (const cardKey of aiPlayer.hand) {
+            const cardDef = definitions[cardKey];
+            let canAfford = true;
+            
+            // Chequear si puede pagar
+            for (const [res, cost] of Object.entries(cardDef.cost)) {
+                if (aiPlayer.resources[res] < cost) {
+                    canAfford = false;
+                    break;
+                }
+            }
+            
+            if (!canAfford) continue;
+
+            // Prioridad 1.1: ¿Esta carta suma directamente a un objetivo faltante?
+            if (cardDef.effect.type === 'score' && missingScores[cardDef.effect.target]) {
+                bestCardKey = cardKey;
+                break; // Jugar inmediatamente la primera carta útil encontrada
+            } 
+            
+            // Prioridad 1.2: ¿Es una carta múltiple que ayuda a un objetivo faltante?
+            if (cardDef.effect.type === 'multiple' && cardDef.effect.effects.some(e => e.type === 'score' && missingScores[e.target])) {
+                 bestCardKey = cardKey;
+                 break; // Jugar inmediatamente la primera carta útil encontrada
+            }
+            
+            // Prioridad 1.3: ¿Es una carta de recurso que puede desbloquear jugadas futuras?
+            if (!bestCardKey) {
+                // Si la IA tiene poco presupuesto (< 500) y puede facturar, prioriza.
+                if (cardKey === 'Facturacion_Express' && aiPlayer.resources.presupuesto < 500) {
+                    bestCardKey = cardKey;
+                }
+                // Si tiene baja inspiración (< 5) y puede investigar para regeneración, prioriza.
+                if (cardKey === 'Investigacion_UX' && aiPlayer.resources.inspiracion < 5) {
+                    bestCardKey = cardKey;
+                }
+            }
+        }
+
+        // 3. Jugar la carta elegida o terminar el turno de la IA
+        if (bestCardKey) {
+            tryPlayCard(bestCardKey);
+        } else {
+            // Si no se encontró ninguna carta útil o que pudiera pagar, termina el bucle.
+            break;
+        }
+
+        // Comprobación de victoria después de cada carta jugada
+        if (gameIsOver) return;
+    }
+
+    // Mensaje de fin de turno de la IA
+    showGameMessage(`${aiPlayer.name} (Beta) ha terminado su turno.`, 'info');
+    
+    // El turno oficial finalizará en endTurn, que llama a aiTurn, y luego avanza el turno.
 }
 
 function endTurn() {
     if (gameIsOver) return;
 
+    // Deshabilitar el botón para evitar doble click
+    document.getElementById('btnEndTurn').disabled = true;
+
     const currentPlayerKey = GAME_STATE.game.currentPlayer;
     const nextPlayerKey = currentPlayerKey === 'player1' ? 'player2' : 'player1';
-    const nextPlayer = GAME_STATE[nextPlayerKey];
-    const defs = GAME_STATE.game.resourceDefinitions;
-
+    
     // --- FASE 1: Chequeo de fin de partida por turnos ---
     // Si el turno actual es el máximo, terminamos el juego ANTES de empezar el siguiente turno.
-    if (GAME_STATE.game.currentTurn >= GAME_STATE.game.maxTurns) {
-        handleGameEnd(null); // Fin por límite de turnos, sin ganador directo
+    if (GAME_STATE.game.currentTurn >= GAME_STATE.game.maxTurns && currentPlayerKey === 'player2') {
+         // Si es el turno 10 y el jugador 2 termina, el juego finaliza.
+        handleGameEnd(null); 
         return;
     }
     
     // --- FASE 2: Recarga (Regen del Siguiente Jugador) ---
+    const nextPlayer = GAME_STATE[nextPlayerKey];
+    const defs = GAME_STATE.game.resourceDefinitions;
+    
     for (const res in defs) {
         let regenAmount = defs[res].regen + nextPlayer.extraRegen[res];
         
@@ -359,7 +496,7 @@ function endTurn() {
         nextPlayer.extraRegen[res] = 0;
     }
 
-    // Robar 1 carta
+    // Robar 1 carta (SIEMPRE se roba al inicio del turno del siguiente jugador)
     const cardToDraw = nextPlayer.deck.pop();
     if (cardToDraw) {
         nextPlayer.hand.push(cardToDraw);
@@ -371,20 +508,36 @@ function endTurn() {
             nextPlayer.deck.sort(() => Math.random() - 0.5); 
             const cardToDraw = nextPlayer.deck.pop();
             if (cardToDraw) nextPlayer.hand.push(cardToDraw);
-            showGameMessage("¡Barajando y Robando! El juego continúa.", 'info');
-        } else {
-             showGameMessage("El mazo y el descarte están vacíos. No hay cartas para robar.", 'error');
         }
     }
-
+    
     // --- FASE 3: Cambio de Turno ---
     GAME_STATE.game.currentPlayer = nextPlayerKey;
-    GAME_STATE.game.currentTurn++;
+    if (nextPlayerKey === 'player1') {
+        GAME_STATE.game.currentTurn++;
+    }
 
     showGameMessage(`Turno ${GAME_STATE.game.currentTurn}: ¡Es el turno de ${nextPlayer.name}!`, 'yellow');
-    
-    // --- FASE 4: Actualizar UI y Preparar para el Siguiente Jugador ---
-    updateUI();
+
+    // --- FASE 4: Ejecución de Turno de la IA (si aplica) ---
+    if (nextPlayerKey === 'player2' && !gameIsOver) {
+        // Delay para simular que la IA "piensa"
+        setTimeout(() => {
+            aiTurn(); // Ejecuta la lógica de la IA
+            // Luego, la IA inmediatamente finaliza su turno para que regrese al jugador 1
+            // Usamos un doble setTimeout para simular la espera
+            if (!gameIsOver) {
+                 setTimeout(() => {
+                    // LLamada recursiva a endTurn, que ahora procesará el cambio a player1
+                    endTurn(); 
+                }, 1000); 
+            }
+        }, 1000); 
+    } else {
+        // --- FASE 5: Actualizar UI y Habilitar Botón (Solo para el jugador humano) ---
+        updateUI();
+        document.getElementById('btnEndTurn').disabled = false;
+    }
 }
 
 // --- LÓGICA DE EVENTOS E INICIO ---
@@ -393,13 +546,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función para reiniciar el estado del juego
     const resetGame = () => {
         // Clonación profunda del estado inicial
+        if (typeof INITIAL_GAME_STATE === 'undefined') {
+            console.error("Error crítico: INITIAL_GAME_STATE no está definido. Asegura la carga de game_state.js");
+            return;
+        }
+        
         GAME_STATE = JSON.parse(JSON.stringify(INITIAL_GAME_STATE)); 
         gameIsOver = false;
         document.getElementById('btnEndTurn').disabled = false;
         hideGameOverModal(); // Asegura que el modal esté oculto al iniciar
+        
+        // Barajar el mazo de cada jugador al inicio de la partida
+        const shuffleDeck = (playerKey) => {
+            const player = GAME_STATE[playerKey];
+            player.deck.sort(() => Math.random() - 0.5);
+        };
+        shuffleDeck('player1');
+        shuffleDeck('player2');
+        
+        // Robar 5 cartas iniciales a cada jugador
+        for (let i = 0; i < 5; i++) {
+             let cardP1 = GAME_STATE.player1.deck.pop();
+             if (cardP1) GAME_STATE.player1.hand.push(cardP1);
+             
+             let cardP2 = GAME_STATE.player2.deck.pop();
+             if (cardP2) GAME_STATE.player2.hand.push(cardP2);
+        }
     }
 
-    resetGame(); // Inicializa el estado al cargar
+    // Inicializa el estado para que la colección funcione antes de iniciar partida
+    if (typeof INITIAL_GAME_STATE !== 'undefined') {
+        GAME_STATE = JSON.parse(JSON.stringify(INITIAL_GAME_STATE));
+    }
+
 
     // Botón JUGAR (Inicio de la partida)
     document.getElementById('btnPlay').addEventListener('click', () => {
