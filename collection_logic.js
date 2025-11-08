@@ -3,7 +3,6 @@
  * Contiene funciones para el renderizado visual de elementos de cartas,
  * utilizado tanto para la mano del jugador como para la pantalla de colección.
  * * Depende de:
- * - lucide: Para la iconografía.
  * - GAME_STATE.cardDefinitions: Para obtener los datos de la carta.
  */
 
