@@ -1,155 +1,193 @@
 /**
- * game_state.js
- * Define el estado inicial del juego, las definiciones de recursos,
- * y todas las cartas disponibles (18 en total).
+ * Definiciones de las cartas.
+ * Formato: { [CardKey]: { name, description, cost: {resource: value}, effect: {type, target, value} } }
  */
-
-const GAME_CARD_DEFINITIONS = {
-    // --- CARTAS INICIALES (8) ---
-    Ajuste_Kerning: {
-        name: "Ajuste de Kerning",
-        description: "Optimiza el espaciado entre caracteres para mejorar la legibilidad del título.",
-        cost: { tiempo: 1, inspiracion: 0, presupuesto: 0 },
-        effect: { type: "score", target: "impactoVisual", value: 1 }
-    },
-    Refactor_CSS: {
-        name: "Refactorización de CSS",
-        description: "Limpia y organiza los estilos. Reduce el tiempo de carga ligeramente.",
-        cost: { tiempo: 0, inspiracion: 1, presupuesto: 0 },
-        effect: { type: "resource_gain", target: "tiempo", value: 1 }
-    },
-    Pruebas_Usabilidad: {
-        name: "Pruebas de Usabilidad (A/B)",
-        description: "Identifica un punto de fricción crítico en la navegación.",
-        cost: { tiempo: 2, inspiracion: 1, presupuesto: 0 },
-        effect: { type: "score", target: "usabilidadUX", value: 3 }
-    },
-    Alineacion_Grid: {
-        name: "Alineación al Grid",
-        description: "Asegura que todos los elementos sigan una estructura modular sólida.",
-        cost: { tiempo: 1, inspiracion: 0, presupuesto: 0 },
-        effect: { type: "score", target: "impactoVisual", value: 2 }
-    },
-    Investigacion_UX: {
-        name: "Investigación de Usuario",
-        description: "Dedica un día a entender las necesidades del target. Gana inspiración para el próximo turno.",
-        cost: { tiempo: 2, inspiracion: 0, presupuesto: 0 },
-        effect: { type: "resource_gain", target: "inspiracion", value: 2 }
-    },
-    Optimizacion_Imagenes: {
-        name: "Optimización de Imágenes",
-        description: "Comprime y ajusta los formatos de imagen. Mejora la velocidad de carga y usabilidad.",
-        cost: { tiempo: 1, inspiracion: 0, presupuesto: 0 },
-        effect: { type: "score", target: "usabilidadUX", value: 1 }
-    },
-    Tono_Marca: {
-        name: "Definición del Tono",
-        description: "Alinea la voz del contenido con los valores de la marca.",
-        cost: { tiempo: 1, inspiracion: 1, presupuesto: 0 },
-        effect: { type: "score", target: "cohesionMarca", value: 2 }
-    },
-    Facturacion_Express: {
-        name: "Facturación Express",
-        description: "Envía una factura parcial al cliente. Gana presupuesto inmediatamente.",
-        cost: { tiempo: 1, inspiracion: 0, presupuesto: 0 },
-        effect: { type: "resource_immediate", target: "presupuesto", value: 300 }
-    },
-
-    // --- NUEVAS CARTAS (10) ---
+const CARD_DEFINITIONS = {
+    // --- Cartas de Impacto Visual (Rojo/Rosa) ---
     Tipografia_Audaz: {
         name: "Tipografía Audaz",
-        description: "Implementa una fuente de alto contraste y llamativa. Gran impacto visual, pero consume mucho tiempo.",
-        cost: { tiempo: 3, inspiracion: 1, presupuesto: 0 },
-        effect: { type: "score", target: "impactoVisual", value: 5 }
+        description: "Impacto inmediato en la estética visual. Alto riesgo, alta recompensa.",
+        cost: { tiempo: 2, inspiracion: 1 },
+        effect: { type: "score", target: "impactoVisual", value: 3 },
+        color: "#ff6584"
     },
-    Revision_Accesibilidad: {
-        name: "Revisión de WCAG",
-        description: "Asegura el cumplimiento de las normas de accesibilidad. Mejora la usabilidad y la percepción de marca.",
-        cost: { tiempo: 2, inspiracion: 2, presupuesto: 0 },
+    Paleta_Premium: {
+        name: "Paleta Premium",
+        description: "Añade riqueza visual, pero consume recursos rápidamente.",
+        cost: { tiempo: 3, inspiracion: 2 },
+        effect: { type: "score", target: "impactoVisual", value: 5 },
+        color: "#ff6584"
+    },
+    Minimalismo_Elegante: {
+        name: "Minimalismo Elegante",
+        description: "Maximiza el impacto con menos elementos. Gana tiempo.",
+        cost: { inspiracion: 2 },
+        effect: { type: "multiple", effects: [
+            { type: "score", target: "impactoVisual", value: 2 },
+            { type: "resource_immediate", target: "tiempo", value: 1 }
+        ]},
+        color: "#ff6584"
+    },
+    Animacion_Fina: {
+        name: "Animación Fina",
+        description: "Mejora el impacto y roba una carta para mantener el flujo.",
+        cost: { tiempo: 2, presupuesto: 200 },
+        effect: { type: "multiple", effects: [
+            { type: "score", target: "impactoVisual", value: 2 },
+            { type: "draw", target: null, value: 1 }
+        ]},
+        color: "#ff6584"
+    },
+    // --- Cartas de Usabilidad/UX (Verde) ---
+    Investigacion_UX: {
+        name: "Investigación UX",
+        description: "Descubre mejores prácticas, ganando Inspiración para el próximo turno.",
+        cost: { tiempo: 1 },
+        effect: { type: "resource_gain", target: "inspiracion", value: 2 },
+        color: "#8dff8d"
+    },
+    Test_Usuarios: {
+        name: "Test de Usuarios",
+        description: "Ajusta la usabilidad en función de datos reales.",
+        cost: { tiempo: 3 },
+        effect: { type: "score", target: "usabilidadUX", value: 4 },
+        color: "#8dff8d"
+    },
+    Flujo_Optimizado: {
+        name: "Flujo Optimizado",
+        description: "Simplifica la navegación, mejorando la UX a bajo costo.",
+        cost: { inspiracion: 1 },
+        effect: { type: "score", target: "usabilidadUX", value: 2 },
+        color: "#8dff8d"
+    },
+    Accesibilidad_Avanzada: {
+        name: "Accesibilidad Avanzada",
+        description: "Asegura la usabilidad para todos y roba una carta.",
+        cost: { tiempo: 2, inspiracion: 1 },
         effect: { type: "multiple", effects: [
             { type: "score", target: "usabilidadUX", value: 3 },
-            { type: "score", target: "cohesionMarca", value: 1 }
-        ]}
+            { type: "draw", target: null, value: 1 }
+        ]},
+        color: "#8dff8d"
     },
-    Paleta_Vibrante: {
-        name: "Paleta de Colores Vibrante",
-        description: "Selecciona una paleta energética. Impulsa el impacto visual.",
-        cost: { tiempo: 1, inspiracion: 1, presupuesto: 0 },
-        effect: { type: "score", target: "impactoVisual", value: 3 }
-    },
-    Mapa_Sitio: {
-        name: "Mapa del Sitio Detallado",
-        description: "Planifica la estructura completa del proyecto. Gana tiempo extra para el próximo turno.",
-        cost: { tiempo: 2, inspiracion: 0, presupuesto: 0 },
-        effect: { type: "resource_gain", target: "tiempo", value: 2 }
-    },
-    Storytelling_Marca: {
-        name: "Storytelling de Marca",
-        description: "Teje una narrativa emocional que conecta al usuario con el producto. Refuerza la cohesión de marca.",
-        cost: { tiempo: 2, inspiracion: 2, presupuesto: 0 },
-        effect: { type: "score", target: "cohesionMarca", value: 4 }
-    },
-    Mockup_3D: {
-        name: "Mockup 3D Premium",
-        description: "Renderiza el diseño en un entorno 3D, elevando la percepción visual. Requiere presupuesto extra.",
-        cost: { tiempo: 0, inspiracion: 1, presupuesto: 400 },
-        effect: { type: "score", target: "impactoVisual", value: 4 }
-    },
-    Integracion_API: {
-        name: "Integración de API",
-        description: "Conecta fuentes de datos externas. Aumenta la complejidad, pero mejora la usabilidad.",
-        cost: { tiempo: 3, inspiracion: 0, presupuesto: 200 },
-        effect: { type: "score", target: "usabilidadUX", value: 4 }
-    },
-    Workshop_Creativo: {
-        name: "Workshop Creativo",
-        description: "Sesión intensa de lluvia de ideas. Gana una carta nueva y recupera inspiración.",
-        cost: { tiempo: 1, inspiracion: 0, presupuesto: 0 },
+    // --- Cartas de Cohesión de Marca (Azul) ---
+    Guia_Estilo: {
+        name: "Guía de Estilo",
+        description: "Establece la coherencia. Gana un poco de cada puntuación.",
+        cost: { tiempo: 3 },
         effect: { type: "multiple", effects: [
-            { type: "draw" },
-            { type: "resource_immediate", target: "inspiracion", value: 1 }
-        ]}
+            { type: "score", target: "cohesionMarca", value: 2 },
+            { type: "score", target: "impactoVisual", value: 1 },
+            { type: "score", target: "usabilidadUX", value: 1 }
+        ]},
+        color: "#8d8dff"
     },
-    Sistema_Diseno: {
-        name: "Sistema de Diseño Básico",
-        description: "Establece reglas fundamentales de UI. Beneficia la cohesión y la eficiencia futura.",
-        cost: { tiempo: 3, inspiracion: 2, presupuesto: 0 },
+    Tono_Voz: {
+        name: "Tono de Voz",
+        description: "Define el carácter de la marca. Gana tiempo para implementarlo.",
+        cost: { inspiracion: 1 },
         effect: { type: "multiple", effects: [
-            { type: "score", target: "cohesionMarca", value: 3 },
-            { type: "resource_gain", target: "tiempo", value: 1 }
-        ]}
+            { type: "score", target: "cohesionMarca", value: 2 },
+            { type: "resource_immediate", target: "tiempo", value: 1 }
+        ]},
+        color: "#8d8dff"
     },
-    Contrato_Retainer: {
-        name: "Contrato Retainer",
-        description: "Asegura trabajo futuro y estabilidad financiera. Gran ganancia de presupuesto inmediata.",
-        cost: { tiempo: 0, inspiracion: 0, presupuesto: 0 },
-        effect: { type: "resource_immediate", target: "presupuesto", value: 600 }
+    Integracion_Logotipo: {
+        name: "Integración Logotipo",
+        description: "Asegura que el logo esté presente y cohesionado en todos los puntos.",
+        cost: { tiempo: 1, inspiracion: 1 },
+        effect: { type: "score", target: "cohesionMarca", value: 3 },
+        color: "#8d8dff"
+    },
+    Arquitectura_Solida: {
+        name: "Arquitectura Sólida",
+        description: "Un backend bien pensado que refuerza la marca. Alto costo.",
+        cost: { tiempo: 4, presupuesto: 300 },
+        effect: { type: "score", target: "cohesionMarca", value: 6 },
+        color: "#8d8dff"
+    },
+    // --- Cartas de Recurso/Utility (Amarillo) ---
+    Facturacion_Express: {
+        name: "Facturación Express",
+        description: "Cobra un anticipo inesperado, ganando presupuesto instantáneo.",
+        cost: { tiempo: 1 },
+        effect: { type: "resource_immediate", target: "presupuesto", value: 400 },
+        color: "#f5f58c"
+    },
+    Cafe_Doble: {
+        name: "Café Doble",
+        description: "Un impulso de cafeína para ganar Tiempo de diseño.",
+        cost: { presupuesto: 100 },
+        effect: { type: "resource_immediate", target: "tiempo", value: 2 },
+        color: "#f5f58c"
+    },
+    Brainstorming_Intenso: {
+        name: "Brainstorming Intenso",
+        description: "Genera ideas, recuperando inspiración.",
+        cost: { tiempo: 1 },
+        effect: { type: "resource_immediate", target: "inspiracion", value: 2 },
+        color: "#f5f58c"
+    },
+    Pivote_Agil: {
+        name: "Pivote Ágil",
+        description: "Cambia rápidamente la dirección del proyecto. Te hace robar 2 cartas.",
+        cost: { inspiracion: 1 },
+        effect: { type: "multiple", effects: [
+            { type: "draw", target: null, value: 1 },
+            { type: "draw", target: null, value: 1 }
+        ]},
+        color: "#f5f58c"
+    },
+    
+    // --- Cartas de Alto Impacto (Especiales) ---
+    Lanzamiento_Beta: {
+        name: "Lanzamiento Beta",
+        description: "Un lanzamiento provisional que da impacto y cohesión.",
+        cost: { tiempo: 4, inspiracion: 2 },
+        effect: { type: "multiple", effects: [
+            { type: "score", target: "impactoVisual", value: 3 },
+            { type: "score", target: "cohesionMarca", value: 3 }
+        ]},
+        color: "#ff6584"
+    },
+    Framework_Eficiente: {
+        name: "Framework Eficiente",
+        description: "Una base de código excelente para alta usabilidad y ahorro.",
+        cost: { presupuesto: 400, tiempo: 1 },
+        effect: { type: "multiple", effects: [
+            { type: "score", target: "usabilidadUX", value: 4 },
+            { type: "resource_immediate", target: "presupuesto", value: 100 }
+        ]},
+        color: "#8dff8d"
     }
 };
 
-// Crea un mazo de 20 cartas para cada jugador (las 18 únicas, más 2 extras comunes)
-const ALL_CARD_KEYS = Object.keys(GAME_CARD_DEFINITIONS);
-const BASE_DECK = [...ALL_CARD_KEYS, 'Ajuste_Kerning', 'Refactor_CSS']; // 20 cartas
-
+/**
+ * Define el estado inicial del juego.
+ * Mazo balanceado y recursos iniciales.
+ */
 const INITIAL_GAME_STATE = {
-    cardDefinitions: GAME_CARD_DEFINITIONS,
-    
+    // Definiciones estáticas (las cartas)
+    cardDefinitions: CARD_DEFINITIONS,
+
+    // Definiciones del juego
     game: {
-        currentPlayer: 'player1', // El jugador 1 siempre comienza
         currentTurn: 1,
-        maxTurns: 10, // Límite de turnos para el juego
+        maxTurns: 10, // Límite de turnos para terminar la partida
+        currentPlayer: 'player1', // 'player1' (humano) o 'player2' (IA)
         victoryThresholds: {
             impactoVisual: 12,
             usabilidadUX: 12,
             cohesionMarca: 12
         },
         resourceDefinitions: {
-            tiempo: { max: 5, regen: 2 },        // Tiempo (T)
-            inspiracion: { max: 5, regen: 1 },   // Inspiración (I)
-            presupuesto: { max: 9999, regen: 0 } // Presupuesto (P) - no se regenera
+            tiempo: { max: 5, regen: 3, unit: '⏱️' },
+            inspiracion: { max: 5, regen: 2, unit: '✨' },
+            presupuesto: { max: Infinity, regen: 0, unit: '$' }
         }
     },
 
+    // Estado del Jugador Humano
     player1: {
         name: "Diseñador Humano",
         scores: {
@@ -160,18 +198,26 @@ const INITIAL_GAME_STATE = {
         resources: {
             tiempo: 5,
             inspiracion: 5,
-            presupuesto: 500
+            presupuesto: 1000 // Presupuesto inicial
         },
-        extraRegen: { // Recursos extra ganados que se aplican el próximo turno
+        extraRegen: { // Recursos extra ganados que se aplicarán el próximo turno
             tiempo: 0,
-            inspiracion: 0,
-            presupuesto: 0
+            inspiracion: 0
         },
-        deck: [...BASE_DECK], // Copia inicial del mazo
-        hand: [], // Cartas iniciales se reparten al iniciar
+        // Mazo inicial: balanceado entre los 3 tipos principales y utilidad
+        deck: [
+            'Tipografia_Audaz', 'Minimalismo_Elegante', 'Paleta_Premium', 
+            'Investigacion_UX', 'Flujo_Optimizado', 'Test_Usuarios', 
+            'Guia_Estilo', 'Tono_Voz', 'Integracion_Logotipo', 
+            'Facturacion_Express', 'Cafe_Doble', 'Brainstorming_Intenso',
+            'Animacion_Fina', 'Accesibilidad_Avanzada', 'Pivote_Agil',
+            'Lanzamiento_Beta', 'Framework_Eficiente', 'Arquitectura_Solida'
+        ],
+        hand: [], // Se llenará con 5 cartas al inicio del juego
         discard: []
     },
 
+    // Estado del Jugador IA (Oponente)
     player2: {
         name: "Diseñador Beta",
         scores: {
@@ -182,15 +228,22 @@ const INITIAL_GAME_STATE = {
         resources: {
             tiempo: 5,
             inspiracion: 5,
-            presupuesto: 500
+            presupuesto: 1000
         },
         extraRegen: {
             tiempo: 0,
-            inspiracion: 0,
-            presupuesto: 0
+            inspiracion: 0
         },
-        deck: [...BASE_DECK], 
-        hand: [], 
+        // El mazo de la IA es idéntico para un juego justo
+        deck: [
+            'Tipografia_Audaz', 'Minimalismo_Elegante', 'Paleta_Premium', 
+            'Investigacion_UX', 'Flujo_Optimizado', 'Test_Usuarios', 
+            'Guia_Estilo', 'Tono_Voz', 'Integracion_Logotipo', 
+            'Facturacion_Express', 'Cafe_Doble', 'Brainstorming_Intenso',
+            'Animacion_Fina', 'Accesibilidad_Avanzada', 'Pivote_Agil',
+            'Lanzamiento_Beta', 'Framework_Eficiente', 'Arquitectura_Solida'
+        ],
+        hand: [], // Se llenará con 5 cartas al inicio del juego
         discard: []
     }
 };
