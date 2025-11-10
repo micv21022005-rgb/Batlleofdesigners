@@ -3,24 +3,25 @@
 let GAME_STATE = {}; 
 let gameIsOver = false;
 
-// --- FUNCIONES DE UTILIDAD (Las mismas que antes) ---
+// --- FUNCIONES DE UTILIDAD ---
 
 function showGameMessage(message, type = 'yellow') {
     const msgBox = document.getElementById('message-box');
     if (!msgBox) return;
     
-    msgBox.className = 'fixed top-0 left-0 right-0 p-4 text-center font-bold transition-all';
+    msgBox.className = 'fixed top-0 left-0 right-0 p-3 text-center font-bold transition-all';
     
     if (type === 'success') {
         msgBox.classList.add('bg-green-500', 'text-green-900');
     } else if (type === 'error') {
-        msgBox.classList.add('bg-red-500', 'text-red-900');
+        msgBox.classList.add('bg-red-500', 'text-white');
     } else if (type === 'info') {
-        msgBox.classList.add('bg-blue-500', 'text-blue-900');
+        msgBox.classList.add('bg-blue-500', 'text-white');
     } else { // default: yellow
-        msgBox.classList.add('bg-yellow-500', 'text-yellow-900');
+        msgBox.classList.add('bg-yellow-500', 'text-gray-900');
     }
 
+    msgBox.classList.add('rounded-b-lg');
     msgBox.textContent = message;
     msgBox.classList.remove('hidden');
 
@@ -38,6 +39,8 @@ function switchView(targetId) {
         if (screen) {
             if (id === targetId) {
                 screen.classList.remove('hidden');
+                // Al volver al menú, restablecer la clase screen para centrar
+                if (id === 'menu-screen') screen.classList.add('flex'); else screen.classList.remove('flex');
             } else {
                 screen.classList.add('hidden');
             }
@@ -55,7 +58,7 @@ function switchView(targetId) {
     }
 }
 
-// --- FUNCIONES DE RENDERIZADO (Las mismas que antes) ---
+// --- FUNCIONES DE RENDERIZADO ---
 
 function renderResources(playerKey) {
     const player = GAME_STATE[playerKey];
@@ -64,7 +67,6 @@ function renderResources(playerKey) {
     
     document.getElementById('res-tiempo').textContent = `${resources.tiempo}/${defs.tiempo.max}`;
     document.getElementById('res-inspiracion').textContent = `${resources.inspiracion}/${defs.inspiracion.max}`;
-    // Formato de presupuesto como dinero
     document.getElementById('res-presupuesto').textContent = `$${resources.presupuesto}`;
 }
 
@@ -91,6 +93,7 @@ function renderScores() {
     const oppThresholds = GAME_STATE.game.victoryThresholds;
     document.getElementById('opponent-name').textContent = GAME_STATE[opponentKey].name;
 
+    // Renderizado compacto de scores del oponente
     document.getElementById('opponent-scores').innerHTML = `
         <p class="text-[#ff6584]">Impacto: <strong>${oppScores.impactoVisual}/${oppThresholds.impactoVisual}</strong></p>
         <p class="text-[#8dff8d]">Usabilidad: <strong>${oppScores.usabilidadUX}/${oppThresholds.usabilidadUX}</strong></p>
@@ -116,7 +119,10 @@ function renderHand(playerKey) {
         // Mano del oponente: solo mostrar el reverso de las cartas
         for(let i = 0; i < player.hand.length; i++) {
             const hiddenCard = document.createElement('div');
-            hiddenCard.className = 'card rounded-xl shadow-lg bg-[#5a547b] border-4 border-[#3b3558] flex items-center justify-center text-lg font-bold text-[#bae8e8]';
+            // Clase de carta oculta con estilo del oponente
+            hiddenCard.className = 'card rounded-sm shadow-lg bg-[#5a547b] border-2 border-[#b8c1ec] flex items-center justify-center text-sm font-bold text-[#1a1a2e]';
+            hiddenCard.style.width = '120px'; // Cartas más pequeñas para el oponente
+            hiddenCard.style.height = '160px';
             hiddenCard.textContent = 'BETA';
             handContainer.appendChild(hiddenCard);
         }
@@ -143,19 +149,18 @@ function checkLeadership() {
     const leaderIndicator = document.getElementById('leader-indicator');
 
     let leaderName = 'Empate';
-    let leaderColor = 'bg-[#433c67]'; // Gris/púrpura para empate
+    let leaderColor = 'bg-[#433c67] text-[#bae8e8]'; // Gris/púrpura para empate
 
     if (score1 > score2) {
         leaderName = GAME_STATE.player1.name;
-        leaderColor = 'bg-yellow-500 text-gray-900';
+        leaderColor = 'bg-[#ff6584] text-white'; // Rosa para líder
     } else if (score2 > score1) {
         leaderName = GAME_STATE.player2.name;
-        leaderColor = 'bg-red-500 text-white';
+        leaderColor = 'bg-yellow-500 text-gray-900'; // Amarillo para IA líder
     }
 
     leaderIndicator.textContent = `Líder: ${leaderName}`;
-    // Se actualiza la clase para cambiar el color del indicador visual
-    leaderIndicator.className = `text-sm font-semibold py-1 px-3 rounded-full ${leaderColor} transition-all duration-300`;
+    leaderIndicator.className = `text-xs font-semibold py-1 px-2 rounded ${leaderColor} transition-all duration-300`;
 }
 
 // Función principal para actualizar toda la interfaz
@@ -164,14 +169,14 @@ function updateUI() {
     renderResources(playerKey);
     renderScores();
     renderHand(playerKey);
-    checkLeadership(); // Chequea y muestra el liderazgo al final de cada acción
+    checkLeadership(); 
 }
 
 // --- LÓGICA DEL MODAL DE FIN DE PARTIDA ---
 
 function showGameOverModal(title, message, icon) {
     // Asegurarse de que el icono de lucide esté disponible antes de insertarlo
-    const iconSvg = typeof lucide !== 'undefined' && lucide.createIcons()[icon] ? lucide.createIcons()[icon].toSvg({ name: icon, class: 'w-16 h-16 mx-auto text-yellow-400' }) : `<div class="text-7xl">🏆</div>`;
+    const iconSvg = typeof lucide !== 'undefined' && lucide.createIcons()[icon] ? lucide.createIcons()[icon].toSvg({ name: icon, class: 'w-16 h-16 mx-auto text-[#f5f58c]' }) : `<div class="text-7xl">🏆</div>`;
     
     document.getElementById('modal-title').textContent = title;
     document.getElementById('modal-message').textContent = message;
@@ -184,7 +189,7 @@ function hideGameOverModal() {
 }
 
 
-// --- LÓGICA DE JUEGO CENTRAL (Las mismas que antes) ---
+// --- LÓGICA DE JUEGO CENTRAL ---
 
 function handleGameEnd(winner) {
     gameIsOver = true;
@@ -217,7 +222,6 @@ function handleGameEnd(winner) {
         }
     }
     
-    // Muestra el modal de fin de partida (Funcionalidad solicitada: Reiniciar o Menú)
     showGameOverModal(modalTitle, modalMessage, modalIcon);
 }
 
@@ -352,7 +356,7 @@ function playCard(cardKey) {
     return true; // Retorna true para indicar que la carta se jugó con éxito
 }
 
-// --- LÓGICA DE INTELIGENCIA ARTIFICIAL (AI) (La misma que antes) ---
+// --- LÓGICA DE INTELIGENCIA ARTIFICIAL (AI) ---
 
 /**
  * Lógica de decisión del oponente (Diseñador Beta).
@@ -603,17 +607,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnEndTurn').addEventListener('click', endTurn);
 
     // --- LISTENERS PARA EL MODAL DE FIN DE PARTIDA ---
-    // (Estos son los que el usuario especificó que debían existir)
     document.getElementById('btnModalRestart').addEventListener('click', () => {
         hideGameOverModal();
-        resetGame(); // Reinicia el estado del juego
-        switchView('game-screen'); // Vuelve a la pantalla de juego
+        resetGame(); 
+        switchView('game-screen'); 
         updateUI(); 
         showGameMessage("¡Partida Reiniciada! Un nuevo Brief ha llegado.");
     });
 
     document.getElementById('btnModalMenu').addEventListener('click', () => {
         hideGameOverModal();
-        switchView('menu-screen'); // Vuelve al menú principal
+        switchView('menu-screen'); 
     });
 });
