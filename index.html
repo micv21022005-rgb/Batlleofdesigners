@@ -3,85 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battle of designer´s: La Batalla del Brief</title>
+    <title>Batalla de Diseñadores: La Lucha por el Brief</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1a1a2e; /* Fondo oscuro principal */
-            color: #bae8e8; /* Texto claro principal */
-            overflow: hidden; /* Evitar scroll innecesario */
-        }
-        .screen {
-            height: 100vh;
-            width: 100vw;
-        }
-        .main-menu-card {
-            background: #232946; /* Gris azulado oscuro */
-            border: 4px solid #b8c1ec; /* Borde suave */
-        }
-        .btn-primary {
-            background-color: #ff6584; /* Rosa/Rojo de acción */
-            color: #232946;
-            font-weight: 700;
-            transition: all 0.2s;
-            box-shadow: 0 4px 0 #b8c1ec;
-            border-radius: 12px;
-        }
-        .btn-primary:hover:not(:disabled) {
-            background-color: #e45876;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #b8c1ec;
-        }
-        .btn-primary:active:not(:disabled) {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #b8c1ec;
-        }
-        .card {
-            width: 150px;
-            min-height: 200px;
-            background: #232946;
-            border: 2px solid #3b3558;
-            padding: 10px;
-            box-shadow: 4px 4px 0 #b8c1ec;
-            position: relative;
-            cursor: pointer;
-        }
-        .playable-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 8px 8px 0 #ff6584;
-        }
-        .card-cost {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        .cost-chip {
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-        .resource-bar {
-            background: #232946;
-            border: 1px solid #b8c1ec;
-        }
-        /* Estilo para la pantalla de colección */
-        #all-cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            overflow-y: auto;
-            height: calc(100vh - 80px); /* Ajustar altura para dejar espacio al botón de regreso */
-        }
-    </style>
+    
+    <link rel="stylesheet" href="style.css">
     
     <script src="game_state.js"></script>
     <script src="collection_logic.js"></script>
@@ -89,85 +15,95 @@
 </head>
 <body class="p-0 m-0">
 
-    <div id="menu-screen" class="screen flex items-center justify-center">
-        <div class="main-menu-card p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
-            <h1 class="text-4xl font-black mb-6 text-[#ff6584] uppercase tracking-wider">Battle of designer´s</h1>
-            <h2 class="text-xl font-bold mb-8 text-[#b8c1ec]">La Batalla del Brief</h2>
-            <div class="space-y-4">
-                <button id="btnPlay" class="btn-primary w-full p-3 text-lg">Jugar Partida Nueva</button>
-                <button id="btnCollection" class="btn-primary w-full p-3 bg-[#b8c1ec] text-[#232946] shadow-none hover:bg-[#a6b1e1]">Colección de Cartas</button>
-                </div>
+    <div id="menu-screen" class="screen">
+        <div class="main-menu-card p-8 rounded-lg w-full text-center">
+            <h1 class="main-title mb-2 uppercase">Batalla de Diseñadores</h1>
+            <h2 class="text-xl font-bold mb-12 text-[#b8c1ec]">La Lucha por el Brief</h2>
+            <div class="space-y-6">
+                <button id="btnPlay" class="btn-primary w-full p-4">Jugar Partida Nueva</button>
+                <button id="btnCollection" class="btn-primary w-full p-4 bg-[#b8c1ec] text-[#232946] shadow-none hover:bg-[#a6b1e1]">Colección de Cartas</button>
+            </div>
         </div>
     </div>
 
-    <div id="game-screen" class="screen hidden flex flex-col p-4">
+    <div id="game-screen" class="hidden flex-col">
         
-        <div id="message-box" class="fixed top-0 left-0 right-0 p-4 text-center font-bold transition-all hidden z-50"></div>
+        <div id="message-box" class="fixed top-0 left-0 right-0 p-3 text-center font-bold transition-all hidden z-50 rounded-b-lg"></div>
 
-        <div class="bg-[#232946] p-3 rounded-xl shadow-lg border border-[#3b3558]">
+        <div class="flex flex-col mb-2 p-2 game-panel">
             <div class="flex justify-between items-center mb-2">
-                <h3 id="opponent-name" class="text-xl font-black text-[#ff6584]">Diseñador Beta</h3>
-                <div id="leader-indicator" class="text-sm font-semibold py-1 px-3 rounded-full bg-[#433c67] transition-all duration-300">Líder: Empate</div>
-            </div>
-            <div id="opponent-scores" class="flex justify-start space-x-6 text-sm">
+                <h3 id="opponent-name" class="text-2xl font-black text-[#ff6584]">Diseñador Beta</h3>
+                <div class="flex items-center space-x-3">
+                    <div id="leader-indicator" class="text-xs font-semibold py-1 px-2 rounded bg-[#433c67] transition-all duration-300">Líder: Empate</div>
+                    <div class="bg-[#433c67] p-1 rounded font-bold text-sm">
+                        Turno <span id="turn-count">1</span>/<span id="max-turn-count">10</span>
+                    </div>
                 </div>
-            <div id="opponent-hand" class="flex justify-center space-x-2 mt-3 h-[200px] overflow-hidden">
+            </div>
+
+            <div id="opponent-scores" class="flex justify-start space-x-4 text-sm font-medium mb-2">
+                </div>
+            
+            <div id="opponent-hand" class="flex justify-center space-x-1 h-[100px] overflow-hidden">
                 </div>
         </div>
         
-        <div class="flex justify-between items-center my-4">
-            <h2 class="text-2xl font-black text-[#b8c1ec]">BRIEF DEL PROYECTO</h2>
-            <div class="bg-[#433c67] p-2 rounded-lg font-bold text-lg">
-                Turno <span id="turn-count">1</span>/<span id="max-turn-count">10</span>
+        <div class="game-panel mb-2">
+            <h2 class="text-xl font-black text-[#b8c1ec] text-center mb-3">OBJETIVOS DEL BRIEF</h2>
+            <div class="score-bar-container">
+                <div class="score-item">
+                    <p class="font-bold text-[#ff6584]">Impacto Visual</p>
+                    <p class="text-xl font-extrabold"><span id="score-impacto">0/12</span> PB</p>
+                </div>
+                <div class="score-item">
+                    <p class="font-bold text-[#8dff8d]">Usabilidad/UX</p>
+                    <p class="text-xl font-extrabold"><span id="score-usabilidad">0/12</span> PB</p>
+                </div>
+                <div class="score-item">
+                    <p class="font-bold text-[#8d8dff]">Cohesión de Marca</p>
+                    <p class="text-xl font-extrabold"><span id="score-cohesion">0/12</span> PB</p>
+                </div>
             </div>
         </div>
-
+        
         <div class="flex-grow flex flex-col justify-end">
-            <div class="flex justify-between items-center bg-[#232946] p-3 rounded-xl shadow-lg border border-[#3b3558] mb-4">
-                <h3 id="current-player-name" class="text-xl font-black text-[#b8c1ec]">Diseñador Humano</h3>
-                <div class="flex space-x-4 font-bold text-base">
-                    <span class="text-[#ff6584]">⏱️ Tiempo: <span id="res-tiempo">5/5</span></span>
-                    <span class="text-[#8dff8d]">✨ Inspiración: <span id="res-inspiracion">5/5</span></span>
-                    <span class="text-[#f5f58c]">💵 Presupuesto: <span id="res-presupuesto">$500</span></span>
+            <div class="flex justify-between items-center game-panel mb-2">
+                <h3 id="current-player-name" class="text-xl font-black text-[#bae8e8]">Diseñador Humano</h3>
+                <div class="flex space-x-4">
+                    <span class="resource-text text-[#ff6584]">⏱️ Tiempo: <span id="res-tiempo">5/5</span></span>
+                    <span class="resource-text text-[#8dff8d]">✨ Insp.: <span id="res-inspiracion">5/5</span></span>
+                    <span class="resource-text text-[#f5f58c]">💵 Pres.: <span id="res-presupuesto">$500</span></span>
                 </div>
+                <button id="btnEndTurn" class="btn-primary p-2 text-base">FIN DE TURNO</button>
             </div>
 
-            <div class="flex justify-between bg-[#232946] p-3 rounded-xl shadow-lg border border-[#3b3558] mb-4">
-                <div class="text-center">
-                    <p class="text-lg font-black text-[#ff6584]">Impacto Visual</p>
-                    <p class="text-2xl font-extrabold"><span id="score-impacto">0/12</span> PB</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-lg font-black text-[#8dff8d]">Usabilidad/UX</p>
-                    <p class="text-2xl font-extrabold"><span id="score-usabilidad">0/12</span> PB</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-lg font-black text-[#8d8dff]">Cohesión de Marca</p>
-                    <p class="text-2xl font-extrabold"><span id="score-cohesion">0/12</span> PB</p>
-                </div>
-                <button id="btnEndTurn" class="btn-primary p-3 self-center">FIN DE TURNO</button>
-            </div>
-
-            <div id="player-hand" class="flex justify-center space-x-4 h-[220px]">
+            <div id="player-hand" class="flex flex-shrink-0">
                 </div>
         </div>
     </div>
 
-    <div id="collection-screen" class="screen hidden p-4 flex flex-col">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-3xl font-black text-[#ff6584]">Portafolio de Cartas (18 Diseños)</h1>
+    <div id="collection-screen" class="screen hidden p-4 flex-col">
+        <div class="flex justify-between items-center mb-4 w-full max-w-7xl">
+            <h1 class="text-3xl font-black text-[#ff6584]">Portafolio de Diseños (18 Cartas)</h1>
             <button id="btnCollectionBack" class="btn-primary p-2 bg-[#433c67] text-[#bae8e8] shadow-none hover:bg-[#5a547b]">Regresar al Menú</button>
         </div>
-        <div id="all-cards-container" class="flex-grow">
+        <div id="all-cards-container" class="flex-grow w-full max-w-7xl overflow-y-auto">
             <p class="text-center text-xl mt-10">Cargando cartas...</p>
         </div>
     </div>
 
     <div id="game-over-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
-        <div class="bg-[#232946] p-8 rounded-2xl shadow-2xl w-full max-w-lg text-center border-4 border-[#ff6584]">
+        <div class="bg-[#232946] p-8 rounded-lg w-full max-w-md text-center border-4 border-[#ff6584] shadow-2xl">
             <div id="modal-content-icon" class="mb-4">
                 </div>
             <h2 id="modal-title" class="text-4xl font-black mb-4 text-[#f5f58c]">¡FIN DEL BRIEF!</h2>
             <p id="modal-message" class="text-xl mb-8 text-[#bae8e8]">El tiempo se ha agotado. ¡Es un empate!</p>
             <div class="space-y-4">
-                <button id="btnModalRestart" class="btn-
+                <button id="btnModalRestart" class="btn-primary w-full p-3">Reiniciar Partida</button>
+                <button id="btnModalMenu" class="btn-primary w-full p-3 bg-[#433c67] text-[#bae8e8] shadow-none hover:bg-[#5a547b]">Volver al Menú Principal</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
