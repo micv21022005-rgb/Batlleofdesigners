@@ -3,7 +3,7 @@
 let GAME_STATE = {}; 
 let gameIsOver = false;
 
-// --- FUNCIONES DE UTILIDAD ---
+// --- FUNCIONES DE UTILIDAD (Las mismas que antes) ---
 
 function showGameMessage(message, type = 'yellow') {
     const msgBox = document.getElementById('message-box');
@@ -55,7 +55,7 @@ function switchView(targetId) {
     }
 }
 
-// --- FUNCIONES DE RENDERIZADO ---
+// --- FUNCIONES DE RENDERIZADO (Las mismas que antes) ---
 
 function renderResources(playerKey) {
     const player = GAME_STATE[playerKey];
@@ -184,7 +184,7 @@ function hideGameOverModal() {
 }
 
 
-// --- LÓGICA DE JUEGO CENTRAL ---
+// --- LÓGICA DE JUEGO CENTRAL (Las mismas que antes) ---
 
 function handleGameEnd(winner) {
     gameIsOver = true;
@@ -217,7 +217,7 @@ function handleGameEnd(winner) {
         }
     }
     
-    // Muestra el modal de fin de partida
+    // Muestra el modal de fin de partida (Funcionalidad solicitada: Reiniciar o Menú)
     showGameOverModal(modalTitle, modalMessage, modalIcon);
 }
 
@@ -352,7 +352,7 @@ function playCard(cardKey) {
     return true; // Retorna true para indicar que la carta se jugó con éxito
 }
 
-// --- LÓGICA DE INTELIGENCIA ARTIFICIAL (AI) ---
+// --- LÓGICA DE INTELIGENCIA ARTIFICIAL (AI) (La misma que antes) ---
 
 /**
  * Lógica de decisión del oponente (Diseñador Beta).
@@ -602,12 +602,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Botón FIN DE TURNO
     document.getElementById('btnEndTurn').addEventListener('click', endTurn);
 
-    // Otros eventos de menú
-    document.getElementById('btnTutorial').addEventListener('click', () => showGameMessage("Accediendo al Tutorial: Aprendiendo a Kerning...", 'info'));
-    document.getElementById('btnSettings').addEventListener('click', () => showGameMessage("Abriendo Ajustes: ¿Quieres cambiar tu paleta de colores?", 'info'));
-    document.getElementById('btnCredits').addEventListener('click', () => showGameMessage("Diseño inspirado por la comunidad creativa. ¡Gracias!", 'info'));
-
-    // --- NUEVOS LISTENERS PARA EL MODAL DE FIN DE PARTIDA ---
+    // --- LISTENERS PARA EL MODAL DE FIN DE PARTIDA ---
+    // (Estos son los que el usuario especificó que debían existir)
     document.getElementById('btnModalRestart').addEventListener('click', () => {
         hideGameOverModal();
         resetGame(); // Reinicia el estado del juego
