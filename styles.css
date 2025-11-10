@@ -1,4 +1,151 @@
-/* Configuraciones de fuente y fondo */
+/* Paleta: Dark Synthwave (Fondo: #1a1a2e, Primario: #ff6584, Acento: #b8c1ec) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #1a1a2e; /* Fondo oscuro principal */
+    color: #bae8e8; /* Texto claro principal */
+    overflow: hidden; 
+    /* Fondo cuadriculado (Estilo Retro-Moderno) */
+    background-image: 
+        linear-gradient(to right, #232946 1px, transparent 1px),
+        linear-gradient(to bottom, #232946 1px, transparent 1px);
+    background-size: 25px 25px;
+    background-attachment: fixed;
+}
+
+.screen {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ESTILO DEL MENÚ PRINCIPAL (GRANDE Y CENTRADO) */
+.main-menu-card {
+    background: #232946; /* Gris azulado oscuro */
+    border: 4px solid #b8c1ec; /* Borde suave */
+    box-shadow: 0 0 40px rgba(255, 101, 132, 0.5), 0 0 10px #b8c1ec; /* Efecto neón suave */
+    width: 90%; /* Más grande en el centro */
+    max-width: 600px; 
+    padding: 4rem; /* Padding generoso */
+}
+
+/* AJUSTE: Título principal con neón reducido para mejor legibilidad */
+.main-title {
+    font-family: 'Inter', sans-serif; 
+    font-size: 4rem; 
+    font-weight: 900; /* Extra Black */
+    color: #ff6584; 
+    /* La sombra de texto reducida */
+    text-shadow: 0 0 8px #ff6584, 0 0 3px #ff6584; 
+    letter-spacing: 0.1em; 
+}
+
+/* ESTILO DE BOTONES */
+.btn-primary {
+    background-color: #ff6584; 
+    color: #1a1a2e;
+    font-weight: 900;
+    transition: all 0.2s;
+    box-shadow: 0 4px 0 #b8c1ec;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+}
+.btn-primary:hover:not(:disabled) {
+    background-color: #e45876;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #b8c1ec;
+}
+.btn-primary:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #b8c1ec;
+}
+
+/* ESTILO DE CARTAS (Retro) */
+.card {
+    width: 150px;
+    min-height: 200px;
+    background: #232946;
+    border: 2px solid #b8c1ec; /* Borde brillante */
+    padding: 8px;
+    box-shadow: 3px 3px 0 #ff6584; /* Sombra de color de acción */
+    position: relative;
+    cursor: pointer;
+    border-radius: 4px; /* Bordes más cuadrados */
+}
+.playable-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 6px 6px 0 #bae8e8;
+    border-color: #ff6584;
+}
+
+/* ESTILO DE PANTALLA DE JUEGO (COMPACTO) */
+#game-screen {
+    display: flex;
+    flex-direction: column;
+    padding: 10px; /* Reducir padding general */
+    height: 100vh;
+    justify-content: space-between; /* Distribuir elementos */
+}
+
+.game-panel {
+    background: #232946;
+    padding: 10px; /* Padding reducido */
+    border-radius: 8px;
+    border: 2px solid #3b3558;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Ajustes de mano para que las cartas estén más cerca */
+#player-hand {
+    justify-content: center;
+    gap: 10px; /* Espacio reducido entre cartas */
+    max-height: 240px; /* Altura máxima para la mano */
+}
+
+/* Recursos y Scores en el juego */
+.score-bar-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    flex-wrap: wrap; /* Para móvil */
+}
+.score-item {
+    flex-grow: 1;
+    text-align: center;
+    padding: 8px;
+    background: #3b3558; /* Fondo más oscuro para items */
+    border-radius: 4px;
+}
+.resource-text {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+/* Media Queries para responsividad (mantener compacto) */
+@media (min-width: 1024px) {
+    #game-screen {
+        padding: 20px 50px; 
+    }
+}
+@media (max-width: 640px) {
+     .main-title {
+        font-size: 2.5rem;
+     }
+     .main-menu-card {
+        padding: 2rem;
+     }
+     .score-bar-container {
+        gap: 2px;
+        font-size: 0.75rem;
+     }
+     .score-item {
+        padding: 4px;
+     }
+}/* Configuraciones de fuente y fondo */
 body {
     font-family: 'Inter', sans-serif;
     background-color: #1a1a2e; /* Fondo oscuro principal */
